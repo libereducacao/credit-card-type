@@ -1,5 +1,5 @@
 {
-  "name": "credit-card-type",
+  "name": "@liberdev/credit-card-type",
   "version": "8.3.0",
   "description": "A library for determining credit card type",
   "main": "index.js",

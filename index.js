@@ -1,27 +1,27 @@
-'use strict';
+"use strict";
 
-var types = require('./lib/card-types');
-var clone = require('./lib/clone');
-var findBestMatch = require('./lib/find-best-match');
-var isValidInputType = require('./lib/is-valid-input-type');
-var addMatchingCardsToResults = require('./lib/add-matching-cards-to-results');
+var types = require("./lib/card-types");
+var clone = require("./lib/clone");
+var findBestMatch = require("./lib/find-best-match");
+var isValidInputType = require("./lib/is-valid-input-type");
+var addMatchingCardsToResults = require("./lib/add-matching-cards-to-results");
 
 var testOrder;
 var customCards = {};
 
 var cardNames = {
-  VISA: 'visa',
-  MASTERCARD: 'mastercard',
-  AMERICAN_EXPRESS: 'american-express',
-  DINERS_CLUB: 'diners-club',
-  DISCOVER: 'discover',
-  JCB: 'jcb',
-  UNIONPAY: 'unionpay',
-  MAESTRO: 'maestro',
-  ELO: 'elo',
-  MIR: 'mir',
-  HIPER: 'hiper',
-  HIPERCARD: 'hipercard'
+  VISA: "VISA",
+  MASTERCARD: "MASTERCARD",
+  AMERICAN_EXPRESS: "AMEX",
+  DINERS_CLUB: "DINERS",
+  DISCOVER: "DISCOVER",
+  JCB: "JCB",
+  UNIONPAY: "UNIONPAY",
+  MAESTRO: "MAESTRO",
+  ELO: "ELO",
+  MIR: "MIR",
+  HIPER: "HIPER",
+  HIPERCARD: "HIPERCARD"
 };
 
 var ORIGINAL_TEST_ORDER = [
@@ -46,7 +46,7 @@ function findType(type) {
 }
 
 function getAllCardTypes() {
-  return testOrder.map(function (type) {
+  return testOrder.map(function(type) {
     return clone(findType(type));
   });
 }
@@ -73,7 +73,7 @@ function creditCardType(cardNumber) {
     return getAllCardTypes(testOrder);
   }
 
-  testOrder.forEach(function (type) {
+  testOrder.forEach(function(type) {
     var cardConfiguration = findType(type);
 
     addMatchingCardsToResults(cardNumber, cardConfiguration, results);
@@ -88,17 +88,37 @@ function creditCardType(cardNumber) {
   return results;
 }
 
-creditCardType.getTypeInfo = function (type) {
+/**
+ * Get the masks of a credit card type by card number received
+ *
+ * @param {string} cardNumber
+ *
+ * @return {{maskNumber: string, cvvNumber: string}}
+ */
+creditCardTypes.getMasks = cardNumber => {
+  const result = creditCardType(cardNumber);
+
+  if (typeof result === "string") {
+    const type = findType(result);
+    return type.mask;
+  } else {
+    // VISA is the default mask
+    const type = findType("VISA");
+    return type.mask;
+  }
+};
+
+creditCardType.getTypeInfo = function(type) {
   return clone(findType(type));
 };
 
-creditCardType.removeCard = function (name) {
+creditCardType.removeCard = function(name) {
   var position = getCardPosition(name);
 
   testOrder.splice(position, 1);
 };
 
-creditCardType.addCard = function (config) {
+creditCardType.addCard = function(config) {
   var existingCardPosition = getCardPosition(config.type, true);
 
   customCards[config.type] = config;
@@ -108,21 +128,23 @@ creditCardType.addCard = function (config) {
   }
 };
 
-creditCardType.updateCard = function (cardType, updates) {
+creditCardType.updateCard = function(cardType, updates) {
   var clonedCard;
   var originalObject = customCards[cardType] || types[cardType];
 
   if (!originalObject) {
-    throw new Error('"' + cardType + '" is not a recognized type. Use `addCard` instead.');
+    throw new Error(
+      '"' + cardType + '" is not a recognized type. Use `addCard` instead.'
+    );
   }
 
   if (updates.type && originalObject.type !== updates.type) {
-    throw new Error('Cannot overwrite type parameter.');
+    throw new Error("Cannot overwrite type parameter.");
   }
 
   clonedCard = clone(originalObject, true);
 
-  Object.keys(clonedCard).forEach(function (key) {
+  Object.keys(clonedCard).forEach(function(key) {
     if (updates[key]) {
       clonedCard[key] = updates[key];
     }
@@ -131,14 +153,14 @@ creditCardType.updateCard = function (cardType, updates) {
   customCards[clonedCard.type] = clonedCard;
 };
 
-creditCardType.changeOrder = function (name, position) {
+creditCardType.changeOrder = function(name, position) {
   var currentPosition = getCardPosition(name);
 
   testOrder.splice(currentPosition, 1);
   testOrder.splice(position, 0, name);
 };
 
-creditCardType.resetModifications = function () {
+creditCardType.resetModifications = function() {
   testOrder = clone(ORIGINAL_TEST_ORDER);
   customCards = {};
 };
