@@ -22,7 +22,7 @@ var cardNames = {
   MIR: "MIR",
   HIPER: "HIPER",
   HIPERCARD: "HIPERCARD",
-  UNKOWN: "UNKOWN"
+  UNKNOWN: "UNKNOWN"
 };
 
 var ORIGINAL_TEST_ORDER = [
@@ -67,11 +67,11 @@ function creditCardType(cardNumber) {
   var results = [];
 
   if (!isValidInputType(cardNumber)) {
-    return types["UNKOWN"];
+    return types["UNKNOWN"];
   }
 
   if (cardNumber.length === 0) {
-    return types["UNKOWN"];
+    return types["UNKNOWN"];
   }
 
   testOrder.forEach(function(type) {
@@ -86,7 +86,7 @@ function creditCardType(cardNumber) {
     return bestMatch;
   }
 
-  return types["UNKOWN"];
+  return types["UNKNOWN"];
 }
 
 creditCardType.getTypeInfo = function(type) {
