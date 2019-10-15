@@ -21,7 +21,8 @@ var cardNames = {
   ELO: "ELO",
   MIR: "MIR",
   HIPER: "HIPER",
-  HIPERCARD: "HIPERCARD"
+  HIPERCARD: "HIPERCARD",
+  UNKOWN: "UNKOWN"
 };
 
 var ORIGINAL_TEST_ORDER = [
@@ -66,11 +67,11 @@ function creditCardType(cardNumber) {
   var results = [];
 
   if (!isValidInputType(cardNumber)) {
-    return [];
+    return types["UNKOWN"];
   }
 
   if (cardNumber.length === 0) {
-    return getAllCardTypes(testOrder);
+    return types["UNKOWN"];
   }
 
   testOrder.forEach(function(type) {
@@ -82,31 +83,11 @@ function creditCardType(cardNumber) {
   bestMatch = findBestMatch(results);
 
   if (bestMatch) {
-    return [bestMatch];
+    return bestMatch;
   }
 
-  return results;
+  return types["UNKOWN"];
 }
-
-/**
- * Get the masks of a credit card type by card number received
- *
- * @param {string} cardNumber
- *
- * @return {{maskNumber: string, cvvNumber: string}}
- */
-creditCardTypes.getMasks = cardNumber => {
-  const result = creditCardType(cardNumber);
-
-  if (typeof result === "string") {
-    const type = findType(result);
-    return type.mask;
-  } else {
-    // VISA is the default mask
-    const type = findType("VISA");
-    return type.mask;
-  }
-};
 
 creditCardType.getTypeInfo = function(type) {
   return clone(findType(type));
